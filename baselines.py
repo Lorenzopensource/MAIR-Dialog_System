@@ -13,22 +13,29 @@ print("Baseline 1 (Most Frequent Class) Accuracy:", baseline1_accuracy)
 # Baseline 2: Rule-Based (Word Presence)
 
 keywords = {
-    'ack': ['okay', 'ok', 'sure', 'alright'],
-    'affirm': ['yes', 'yeah', 'yep', 'certainly'],
+    'request' : ['address','phone','postcode','what', 'whats', 'where','what\'s', 'may','please','area','post code','number', 'location'],
+    'inform' : ['irish','french','mexican','austrian','australian','persian','greek','brazilian','mediterranean','bistro',
+                'moderate','moderately','serves', 'any kind','german', 'dont know','either','doesnt matter','cuban','indonesian',
+                'dont care','looking','information', 'informations','food','cuisine','price','european','eastern','japanese','type',
+                'cheap', 'expensive','chic', 'british','arab', 'thai','south', 'north', 'east', 'west', 'moroccan', 'italian', 'fancy',
+                'chinese','asian','oriental','indian','turkish','spanish', 'lebanese','sushi','romanian','welsh','nigerian','bbq','mean',
+                'fish','korean','barbecue','fast food','catalan','pub','pizza','time','center','unusual','hungarian','african','american'],  # the more food specific keywords, the better
+    'null' : ['cough','laughter','silence','noise', 'background', 'inaudible', 'sil', 'unintelligible','system','tv_noise'],
+    'thankyou' : ['thank you', 'thanks',' thankyou', 'thank'],
+    'reqmore' : ['more'],
+    'reqalts' : ['how about','others', 'alternatives', 'different','options','else','other','another','what about','anything'],
     'bye': ['bye', 'goodbye'],
-    'confirm': ['confirm', 'correct', 'right'],
-    'deny' : ['no', 'not'],
-    'hello' : ['hello', 'hi', 'hey'],
-    'inform' : ['information', 'informations','food','cuisine','price','european','eastern','japanese','type','cheap', 'expensive','chic', 'british','arab', 'thai','south', 'north', 'east', 'west', 'moroccan', 'italian', 'fancy','chinese','asian','oriental','indian','turkish','spanish', 'lebanese','sushi','romanian','welsh','nigerian','bbq','mean','fish'],  # the more food specific keywords, the better
+    'affirm': ['yes', 'yeah', 'yep', 'certainly','yea','correct','right'],
+    'ack': ['okay', 'ok', 'sure', 'alright','kay'],
+    'confirm': ['is it', 'is there','does it'],
     'negate' : ['no', 'not'],
-    'null' : ['cough','laughter','silence','noise', 'background', 'inaudible', 'um' 'uh', 'hmm','sil', 'unintelligible'],
+    'deny' : ['wrong' 'don\'t', 'doesn\'t', 'isn\'t', 'wasn\'t', 'aren\'t', 'haven\'t','without','donot','dont'],
+    'hello' : ['hello', 'hi', 'hey','ciao'],
     'repeat' : ['repeat', 'say again', 'once more'],
-    'reqalts' : ['others', 'alternatives', 'different','options','else','other','about'],
-    'reqmore' : ['more', 'additional', 'extra','details'],
-    'request' : ['can you', 'could you', 'would you', 'please','what', 'whats', 'where', 'when', 'which','adress','phone','postcode','may','area'],
-    'restart' : ['restart', 'start over'],
-    'thankyou' : ['thank you', 'thanks']
+    'restart' : ['restart', 'start over']
 }
+
+# Note: changing keyword order can affect results due to early returns in the loop
 
 def rule_based_prediction(utterance):
     utterance = utterance.lower()
