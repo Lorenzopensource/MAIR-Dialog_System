@@ -46,6 +46,7 @@ In that sense we want to develope a mechanism that recognize and labels user int
 After loading the dataset we constructed the required baselines.
 You can check our performances and try a rule-based recognition of your intent running:
  ```bash
+   python dataset_pre-processing.py
    python baselines.py
  ```
 
