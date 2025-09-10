@@ -24,7 +24,7 @@ dataset["dialog_act"] = dataset["dialog_act"].str.lower()
 dataset["utterance"] = dataset["utterance"].str.lower()
 
 # Splitting the dataset into training and testing sets (85% train, 15% test)
-train_data, test_data = train_test_split(dataset, test_size=0.2, random_state=142)
+train_data, test_data = train_test_split(dataset,  test_size=0.15, random_state=142)
 
 # Saving dataset
 train_data.to_csv("train_data.csv", index=False)

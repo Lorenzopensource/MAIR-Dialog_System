@@ -30,8 +30,8 @@ keywords = {
     'confirm': ['is it', 'is there','does it'],
     'negate' : ['no', 'not'],
     'deny' : ['wrong' 'don\'t', 'doesn\'t', 'isn\'t', 'wasn\'t', 'aren\'t', 'haven\'t','without','donot','dont'],
-    'hello' : ['hello', 'hi', 'hey','ciao'],
-    'repeat' : ['repeat', 'say again', 'once more'],
+    'hello' : ['hello', 'hi', 'hey','ciao', 'ha', 'hay'],
+    'repeat' : ['repeat', 'say again', 'once more', 'again'],
     'restart' : ['restart', 'start over']
 }
 
@@ -47,6 +47,8 @@ def rule_based_prediction(utterance):
 
 # Apply rule-based prediction on test data
 test_data['predicted_act'] = test_data['utterance'].apply(rule_based_prediction)
+
+
 baseline2_accuracy = (test_data['dialog_act'] == test_data['predicted_act']).mean()
 print("Baseline 2 (Rule-Based) Accuracy:", baseline2_accuracy)
 
