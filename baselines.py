@@ -55,6 +55,10 @@ test_data['predicted_act'] = test_data['utterance'].apply(rule_based_prediction)
 
 baseline2_accuracy = (test_data['dialog_act'] == test_data['predicted_act']).mean()
 print("Baseline 2 (Rule-Based) Accuracy:", baseline2_accuracy)
+print("Classification report of baseline 2")
+predict_keyword = [rule_based_prediction(utterance) for utterance in test_data["utterance"]]
+print(classification_report(test_data["dialog_act"].to_list(), predict_keyword, zero_division=1))
+
 
 # Apply rule-based prediction on user input (asks for user input and predicts the dialog act, continuously until user types 'exit')
 def user_input_prediction():
