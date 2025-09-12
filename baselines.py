@@ -1,4 +1,5 @@
 import pandas
+from sklearn.metrics import classification_report
 
 # Load the pre-processed testing data
 train_data = pandas.read_csv("train_data.csv")
@@ -9,6 +10,9 @@ most_frequent_class = train_data['dialog_act'].mode()[0]
 print("Most frequent class in training data:", most_frequent_class)
 baseline1_accuracy = (test_data['dialog_act'] == most_frequent_class).mean()
 print("Baseline 1 (Most Frequent Class) Accuracy:", baseline1_accuracy)
+print("Classification report of baseline 1")
+predictions = [most_frequent_class] * len(test_data)
+print(classification_report(test_data["dialog_act"].tolist(), predictions, zero_division=1))
 
 # Baseline 2: Rule-Based (Word Presence)
 
