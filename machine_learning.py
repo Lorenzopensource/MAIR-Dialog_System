@@ -3,6 +3,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
 import numpy as np
 import pandas
 
@@ -29,7 +30,8 @@ def logistic_regression(x_train, y_train, x_test, y_test):
 
     accuracy = accuracy_score(y_test, y_prediction)
     print("Accuracy of logistic regression is:", accuracy)\
-
+    print("Classification report of Logistic Regression Classifier")
+    print(classification_report(y_test, y_prediction, zero_division=1)) 
     return model1
 
 
@@ -41,6 +43,8 @@ def svm(x_train, y_train, x_test, y_test):
 
     accuracy = accuracy_score(y_test, y_prediction)
     print("Accuracy of SVM is:", accuracy)
+    print("Classification report of Support Vector Machine")
+    print(classification_report(y_test, y_prediction, zero_division=1)) 
 
     return model2
 
@@ -53,6 +57,8 @@ def neural_network(x_train, y_train, x_test, y_test):
 
     accuracy = accuracy_score(y_test, y_prediction)
     print("Accuracy of neural network is:", accuracy)
+    print("Classification report of MLP Classifier")
+    print(classification_report(y_test, y_prediction, zero_division=1)) 
 
     return model3
 
