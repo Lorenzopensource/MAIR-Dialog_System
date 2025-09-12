@@ -56,6 +56,8 @@ After generating the baseline models we started developping the machine learning
    python machine_learning.py
  ```
 
+### Evaluation ✅
+Finally, we evaluated the models, including the baseline and the machine learning models. We did this using the classification report with the F1 scores, precision, and recall. The code is implemented in the existing python files baselines and machine learning.
 
 ### Dialog Management ❌
 
