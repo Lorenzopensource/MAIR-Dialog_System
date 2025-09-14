@@ -1,21 +1,6 @@
 import pandas
 from sklearn.metrics import classification_report
 
-# Load the pre-processed testing data
-train_data = pandas.read_csv("train_data.csv")
-test_data = pandas.read_csv("test_data.csv")
-
-# Baseline 1: Most Frequent Class
-most_frequent_class = train_data['dialog_act'].mode()[0]
-print("Most frequent class in training data:", most_frequent_class)
-baseline1_accuracy = (test_data['dialog_act'] == most_frequent_class).mean()
-print("Baseline 1 (Most Frequent Class) Accuracy:", baseline1_accuracy)
-print("Classification report of baseline 1")
-predictions = [most_frequent_class] * len(test_data)
-print(classification_report(test_data["dialog_act"].tolist(), predictions, zero_division=1))
-
-# Baseline 2: Rule-Based (Word Presence)
-
 keywords = {
     'request' : ['address','phone','postcode','what', 'whats', 'where','what\'s', 'may','please','area','post code','number', 'location'],
     'inform' : ['irish','french','mexican','austrian','australian','persian','greek','brazilian','mediterranean','bistro',
@@ -47,26 +32,33 @@ def rule_based_prediction(utterance):
         for word in words:
             if word in utterance:
                 return act
-    return 'not_covered'  # Default class if no keywords match
+    return 'not_covered' 
 
-# Apply rule-based prediction on test data
-test_data['predicted_act'] = test_data['utterance'].apply(rule_based_prediction)
+if __name__ == "__main__":
+    # Load the pre-processed testing data
+    train_data = pandas.read_csv("train_data.csv")
+    test_data = pandas.read_csv("test_data.csv")
 
+    # Baseline 1: Most Frequent Class
+    most_frequent_class = train_data['dialog_act'].mode()[0]
+    print("Most frequent class in training data:", most_frequent_class)
+    baseline1_accuracy = (test_data['dialog_act'] == most_frequent_class).mean()
+    print("Baseline 1 (Most Frequent Class) Accuracy:", baseline1_accuracy)
+    print("Classification report of baseline 1")
+    predictions = [most_frequent_class] * len(test_data)
+    print(classification_report(test_data["dialog_act"].tolist(), predictions, zero_division=1))
 
-baseline2_accuracy = (test_data['dialog_act'] == test_data['predicted_act']).mean()
-print("Baseline 2 (Rule-Based) Accuracy:", baseline2_accuracy)
-print("Classification report of baseline 2")
-predict_keyword = [rule_based_prediction(utterance) for utterance in test_data["utterance"]]
-print(classification_report(test_data["dialog_act"].to_list(), predict_keyword, zero_division=1))
+    # Baseline 2: Rule-Based (Word Presence)
+    test_data['predicted_act'] = test_data['utterance'].apply(rule_based_prediction)
+    baseline2_accuracy = (test_data['dialog_act'] == test_data['predicted_act']).mean()
+    print("Baseline 2 (Rule-Based) Accuracy:", baseline2_accuracy)
+    print("Classification report of baseline 2")
+    predict_keyword = [rule_based_prediction(utterance) for utterance in test_data["utterance"]]
+    print(classification_report(test_data["dialog_act"].to_list(), predict_keyword, zero_division=1))
 
-
-# Apply rule-based prediction on user input (asks for user input and predicts the dialog act, continuously until user types 'exit')
-def user_input_prediction():
     while True:
         user_input = input("Enter an utterance (or type 'q' to quit): ")
         if user_input.lower() == 'q':
             break
         predicted_act = rule_based_prediction(user_input)
         print(f"Predicted Dialog Act: {predicted_act}")
-
-user_input_prediction()

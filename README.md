@@ -51,13 +51,15 @@ You can check our performances and try a rule-based recognition of your intent r
  ```
 
 ### Machine Learning Approach ✅
-After generating the baseline models we started developping the machine learning models. We integrated three different classifiers: Logistic regression, support vectors machines and a neural network. In the evaluation part we will discuss which classifiers has the best performance.
+After generating the baseline models we started developping the machine learning models. We integrated three different classifiers: Logistic regression, support vectors machines and a neural network. 
  ```bash
    python machine_learning.py
  ```
 
 ### Evaluation ✅
 Finally, we evaluated the models, including the baseline and the machine learning models. We did this using the classification report with the F1 scores, precision, and recall. The code is implemented in the existing python files baselines and machine learning.
+
+To get all the details see the [final report](OVERVIEW.md).
 
 ### Dialog Management ❌
 
