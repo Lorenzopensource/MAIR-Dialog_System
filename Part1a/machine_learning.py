@@ -8,6 +8,7 @@ import numpy as np
 import pandas
 import random
 from baselines import rule_based_prediction
+from baselines import most_frequent_class_baseline
 
 
 def preprocess_data(train, test):
@@ -24,42 +25,25 @@ def preprocess_data(train, test):
     return x_train, y_train, x_test, y_test
 
 def logistic_regression(x_train, y_train, x_test, y_test):
-    model1 = LogisticRegression(max_iter=1000)
-    model1.fit(x_train, y_train)
-
-    y_prediction = model1.predict(x_test)
-
-    accuracy = accuracy_score(y_test, y_prediction)
-    print("Accuracy of logistic regression is:", accuracy)
-    print("Classification report of Logistic Regression Classifier")
-    print(classification_report(y_test, y_prediction, zero_division=1)) 
-    return model1
+    model = LogisticRegression(max_iter=1000)
+    model.fit(x_train, y_train)
+    return model
 
 def svm(x_train, y_train, x_test, y_test):
-    model2 = SVC(kernel="rbf")
-    model2.fit(x_train, y_train)
-
-    y_prediction = model2.predict(x_test)
-
-    accuracy = accuracy_score(y_test, y_prediction)
-    print("Accuracy of SVM is:", accuracy)
-    print("Classification report of Support Vector Machine")
-    print(classification_report(y_test, y_prediction, zero_division=1)) 
-
-    return model2
+    model = SVC(kernel="rbf")
+    model.fit(x_train, y_train)
+    return model
 
 def neural_network(x_train, y_train, x_test, y_test):
-    model3 = MLPClassifier()
-    model3.fit(x_train, y_train)
+    model = MLPClassifier()
+    model.fit(x_train, y_train)
+    return model
 
-    y_prediction = model3.predict(x_test)
-
-    accuracy = accuracy_score(y_test, y_prediction)
-    print("Accuracy of neural network is:", accuracy)
-    print("Classification report of MLP Classifier")
-    print(classification_report(y_test, y_prediction, zero_division=1)) 
-
-    return model3
+def evaluation(model_name,model, x_test, y_test):
+    print("Evaluation metrics for {model_name}:")
+    print("Accuracy:", model.score(x_test, y_test))
+    y_pred = model.predict(x_test)
+    print(classification_report(y_test, y_pred, zero_division=1))
 
 def error_analysis(x_test, y_test, model1, model2, model3, test_data):
 
@@ -129,13 +113,9 @@ if __name__ == "__main__":
 
     x_train, y_train, x_test, y_test = preprocess_data(train_data, test_data)
 
-    logistic_regression(x_train, y_train, x_test, y_test)
-    svm(x_train, y_train, x_test, y_test)
-    neural_network(x_train, y_train, x_test, y_test)
-
-    # Now without duplicates
-    print("Now with the duplicates removed")
-    print("===================================================\n")
+    dup_log_reg = logistic_regression(x_train, y_train, x_test, y_test)
+    dup_svm= svm(x_train, y_train, x_test, y_test)
+    dup_neural_net= neural_network(x_train, y_train, x_test, y_test)
 
 
     train_data_no_duplicate = train_data.drop_duplicates()
@@ -143,17 +123,60 @@ if __name__ == "__main__":
 
     x_train, y_train, x_test, y_test = preprocess_data(train_data_no_duplicate, test_data_no_duplicate)
 
-    model1 = logistic_regression(x_train, y_train, x_test, y_test)
-    svm(x_train, y_train, x_test, y_test)
-    neural_network(x_train, y_train, x_test, y_test)
-
-    error_analysis(x_test, y_test.tolist(), model1, svm(x_train, y_train, x_test, y_test), neural_network(x_train, y_train, x_test, y_test), test_data)
+    log_reg = logistic_regression(x_train, y_train, x_test, y_test)
+    svm_ = svm(x_train, y_train, x_test, y_test)
+    neural_net = neural_network(x_train, y_train, x_test, y_test)
 
     while True:
-        sentence = input("Enter an utterance (or type 'q' to quit): ")
-        if sentence.lower() == 'q':
+        user_input = input("Select the model to test or type 'evaluation' (type 'q' to quit) -  Model options: \n 'most_frequent' - 'rule_based' - 'logistic_regression' - 'svm' - 'neural network' \n  ") 
+
+        if user_input.lower() == 'q':
             break
-        else:
-            vectorize = vectorizer.transform([sentence])
-            prediction = model1.predict(vectorize)
+        if user_input.lower() == 'evaluation':
+            evaluation("Logistic Regression with duplicates", dup_log_reg, x_test, y_test)
+            evaluation("SVM with duplicates", dup_svm, x_test, y_test)
+            evaluation("Neural Network with duplicates", dup_neural_net, x_test, y_test)
+            evaluation("Logistic Regression without duplicates", log_reg, x_test, y_test)
+            evaluation("SVM without duplicates", svm_, x_test, y_test)
+            evaluation("Neural Network without duplicates", neural_net, x_test, y_test)
+            error_analysis(x_test, y_test, log_reg, svm_, neural_net, test_data_no_duplicate)
+            continue
+        if user_input.lower() == 'most_frequent':
+            user_input = input("Enter an utterance to classify (or 'q' to quit): ")
+            if user_input.lower() == 'q':
+                break
+            print(f"Predicted Dialog Act: {most_frequent_class_baseline(train_data_path='train_data.csv')}")
+            continue
+        elif user_input.lower() == 'rule_based':
+            user_input = input("Enter an utterance to classify (or 'q' to quit): ")
+            if user_input.lower() == 'q':
+                break
+            predicted_act = rule_based_prediction(user_input)
+            print(f"Predicted Dialog Act: {predicted_act}")
+            continue
+        elif user_input.lower() == 'logistic_regression':   
+            user_input = input("Enter an utterance (or type 'q' to quit): ")
+            if user_input.lower() == 'q':
+                break
+            vectorize = vectorizer.transform([user_input])
+            prediction = log_reg.predict(vectorize)
             print("Predicted dialog_act:", prediction[0])
+            continue
+        elif user_input.lower() == 'svm':   
+            user_input = input("Enter an utterance (or type 'q' to quit): ")
+            if user_input.lower() == 'q':
+                break
+            vectorize = vectorizer.transform([user_input])
+            prediction = svm_.predict(vectorize)
+            print("Predicted dialog_act:", prediction[0])
+            continue
+        elif user_input.lower() == 'neural_network':   
+            user_input = input("Enter an utterance (or type 'q' to quit): ")
+            if user_input.lower() == 'q':
+                break
+            vectorize = vectorizer.transform([user_input])
+            prediction = neural_net.predict(vectorize)
+            print("Predicted dialog_act:", prediction[0])
+            continue
+        else:
+            print("Invalid option. Please choose 'most_frequent' or 'rule_based'.")
