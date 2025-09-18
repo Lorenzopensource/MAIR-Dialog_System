@@ -7,11 +7,9 @@ from sklearn.metrics import classification_report
 import numpy as np
 import pandas
 import random
-from baselines import rule_based_prediction
-from baselines import most_frequent_class_baseline
 
 
-def preprocess_data(train, test):
+def preprocess_data(vectorizer, train, test):
     # Load the pre-processed testing data
     train = train.dropna(subset=["utterance", "dialog_act"])
     test = test.dropna(subset=["utterance", "dialog_act"])
@@ -106,6 +104,10 @@ def error_analysis(x_test, y_test, model1, model2, model3, test_data):
         print(f"\nAll common misclassifications exported to {output_file}")
 
 if __name__ == "__main__":
+
+    from baselines import rule_based_prediction
+    from baselines import most_frequent_class_baseline
+
 
     vectorizer = CountVectorizer(max_features=3000)
     train_data = pandas.read_csv("train_data.csv")
