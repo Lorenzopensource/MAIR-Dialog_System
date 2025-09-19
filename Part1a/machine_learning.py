@@ -7,6 +7,7 @@ from sklearn.metrics import classification_report
 import numpy as np
 import pandas
 import random
+import joblib
 
 
 def preprocess_data(vectorizer, train, test):
@@ -113,7 +114,7 @@ if __name__ == "__main__":
     train_data = pandas.read_csv("train_data.csv")
     test_data = pandas.read_csv("test_data.csv")
 
-    x_train, y_train, x_test, y_test = preprocess_data(train_data, test_data)
+    x_train, y_train, x_test, y_test = preprocess_data(vectorizer, train_data, test_data)
 
     dup_log_reg = logistic_regression(x_train, y_train, x_test, y_test)
     dup_svm= svm(x_train, y_train, x_test, y_test)
@@ -123,11 +124,15 @@ if __name__ == "__main__":
     train_data_no_duplicate = train_data.drop_duplicates()
     test_data_no_duplicate = test_data.drop_duplicates()
 
-    x_train, y_train, x_test, y_test = preprocess_data(train_data_no_duplicate, test_data_no_duplicate)
+    x_train, y_train, x_test, y_test = preprocess_data(vectorizer,train_data_no_duplicate, test_data_no_duplicate)
 
     log_reg = logistic_regression(x_train, y_train, x_test, y_test)
     svm_ = svm(x_train, y_train, x_test, y_test)
     neural_net = neural_network(x_train, y_train, x_test, y_test)
+
+    #Saving the best model
+    joblib.dump(log_reg, 'Utterance_Classifier_NN.pkl')
+    joblib.dump(vectorizer, 'Vectorizer_NN.pkl')
 
     while True:
         user_input = input("Select the model to test or type 'evaluation' (type 'q' to quit) -  Model options: \n 'most_frequent' - 'rule_based' - 'logistic_regression' - 'svm' - 'neural network' \n  ") 

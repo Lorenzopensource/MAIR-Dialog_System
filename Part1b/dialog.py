@@ -1,7 +1,6 @@
-from Part1a.machine_learning import neural_network
-from Part1a.machine_learning import preprocess_data
 from sklearn.feature_extraction.text import CountVectorizer
 import pandas
+import joblib
 
 
 def lookup(properties):
@@ -124,16 +123,8 @@ def state_transaction_function(state, user_input, info):
 
 
 if __name__ == "__main__":
-    vectorizer = CountVectorizer(max_features=3000)
 
-    train_data = pandas.read_csv("train_data.csv")
-    test_data = pandas.read_csv("test_data.csv")
-
-    train_data_no_duplicate = train_data.drop_duplicates()
-    test_data_no_duplicate = test_data.drop_duplicates()
-
-    x_train, y_train, x_test, y_test = preprocess_data(vectorizer, train_data_no_duplicate, test_data_no_duplicate)
-
-    model = neural_network(x_train, y_train, x_test, y_test)
+    model = joblib.load('Utterance_Classifier_NN.pkl')
+    vectorizer = joblib.load('Vectorizer_NN.pkl')
 
     agent()
