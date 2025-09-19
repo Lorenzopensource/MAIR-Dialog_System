@@ -1,10 +1,15 @@
 # Team Contributions
 
-This table summarizes the hours dedicated by each team member across different tasks.
+## Part 1a
+- **Ecenaz Rizeli**: Evaluation
+- **Daan van Dijk**: Machine Learning 
+- **Lorenzo Pasqualotto**: Baselines
+- **Harshavardhani Suresh Kumar**: Testing
 
-| Team Member                 | Coding  | Scientific Writing | Evaluation Research |
-|-----------------------------|---------|--------------------|---------------------|
-| Ecenaz Rizeli               |     2   |                    |                     |
-| Daan van Dijk               |     2   |                    |                     |
-| Harshavardhani Suresh Kumar |      2   |                    |                     |
-| Lorenzo Pasqualotto         |       3 |                    |                     |
+## Part 1b
+- **Ecenaz Rizeli**: Flow Diagram
+- **Daan van Dijk**: Flow Diagram Implementation
+- **Lorenzo Pasqualotto**: Levenshtein function
+- **Harshavardhani Suresh Kumar**: Lookup function
+
+
