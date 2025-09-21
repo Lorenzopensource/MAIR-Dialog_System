@@ -39,7 +39,7 @@ This project is about the development of a restaurant recommendations dialog sys
  ```
 5. **Run the dialog system**:
  ```bash
-   dialog.py
+   python dialog.py
  ```
 6. **An example output of the dialog system**:
     To test the code, you can enter the following samples found at the bottom of the dialog.py. The following is an example of the output.
@@ -88,6 +88,6 @@ We decided to implement the user utterances implicitly in the state transition d
 
 ### Dialog management ✅
  ```bash
-   dialog.py
+  python dialog.py
  ```
 
