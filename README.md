@@ -42,7 +42,7 @@ This project is about the development of a restaurant recommendations dialog sys
     Find a Cuban restaurant in the center
     I want a restaurant in the west
     I want a moderately priced restaurant
-
+```plaintext
     Example output:
    System: Hello! welcome to restaurant search engine how can I help you?
     User:  Find a Cuban restaurant in the center
