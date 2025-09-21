@@ -43,15 +43,15 @@ This project is about the development of a restaurant recommendations dialog sys
    System: Hello! welcome to restaurant search engine how can I help you?
     User:  Find a Cuban restaurant in the center
    System: In what area are you looking for a restaurant?
-    I want a restaurant in the west
+    User:  I want a restaurant in the west
    System: In what price range are you looking?
     User: I want a moderately priced restaurant
     hierrrrrr
    System: So you are looking for a restaurant in west with thai food in the price range moderate right?
-   User: Yes
+    User: Yes
    System: We found this restaurant for you saint johns chop house
     you want another suggestion?
-   User: No
+    User: No
 ```
 
 
