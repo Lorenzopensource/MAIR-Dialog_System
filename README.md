@@ -37,7 +37,28 @@ This project is about the development of a restaurant recommendations dialog sys
  ```bash
    pip install -r requirements.txt
  ```
+5. **Examples to run the code**:
+    To test the code, you can enter the following samples found at the bottom of the dialog.py :
+    Find a Cuban restaurant in the center
+    I want a restaurant in the west
+    I want a moderately priced restaurant
 
+    Example output:
+   System: Hello! welcome to restaurant search engine how can I help you?
+    User:  Find a Cuban restaurant in the center
+   System: In what area are you looking for a restaurant?
+    I want a restaurant in the west
+   System: In what price range are you looking?
+    User: I want a moderately priced restaurant
+    hierrrrrr
+   System: So you are looking for a restaurant in west with thai food in the price range moderate right?
+   User: Yes
+   System: We found this restaurant for you saint johns chop house
+    you want another suggestion?
+   User: No
+
+
+7. 
 
 ## Text Classification
 
@@ -67,4 +88,5 @@ To get all the details see the [final report](OVERVIEW.md).
 We decided to implement the user utterances implicitly in the state transition diagram. This ensures that the diagram remains clear without explicitly repeating the user utterance each time. The first 50 dialogues of the all dialogs were analyzed to find dialogue states and transitions. The examination showed that the three most common transitions were request area, request foodtype, and request price range. In some dialogues, the system asked for confirmation. This means that the choices already made by the user, such as area, food type, and price range, are repeated until they are confirmed by the user. Then the system provided a restaurant suggestion. Subsequently, the user could request information about the restaurant, such as the phone number, postal code, or address. Finally, the conversation ends if the user wants an alternative to the recommended restaurant.
 
 ### Dialog management ✅
+
 
