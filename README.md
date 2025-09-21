@@ -4,7 +4,9 @@ This is the repository for the project assignment of **Methods in AI research**.
 University of Utrecht, Academic Year 2025-2026.
 
 
---
+## Authors
+
+Daan van Dijk,	Lorenzo Pasqualotto, Harshavardhani Suresh Kumar and Ecenaz Rizeli
 
 ## Project Overview
 
@@ -61,5 +63,7 @@ Finally, we evaluated the models, including the baseline and the machine learnin
 
 To get all the details see the [final report](OVERVIEW.md).
 
-### Dialog Management ❌
+### State transition diagram ✅
+
+### Dialog management ✅
 
