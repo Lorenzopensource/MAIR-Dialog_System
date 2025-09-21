@@ -37,7 +37,11 @@ This project is about the development of a restaurant recommendations dialog sys
  ```bash
    pip install -r requirements.txt
  ```
-5. **Examples to run the code**:
+5. **Run the dialog system**:
+ ```bash
+   dialog.py
+ ```
+6. **Examples to run the code**:
     To test the code, you can enter the following samples found at the bottom of the dialog.py. The following is an example of the output.
 ```plaintext
    System: Hello! welcome to restaurant search engine how can I help you?
