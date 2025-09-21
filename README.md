@@ -41,7 +41,7 @@ This project is about the development of a restaurant recommendations dialog sys
  ```bash
    dialog.py
  ```
-6. **Examples to run the code**:
+6. **An example output of the dialog system**:
     To test the code, you can enter the following samples found at the bottom of the dialog.py. The following is an example of the output.
 ```plaintext
    System: Hello! welcome to restaurant search engine how can I help you?
