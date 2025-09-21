@@ -38,12 +38,8 @@ This project is about the development of a restaurant recommendations dialog sys
    pip install -r requirements.txt
  ```
 5. **Examples to run the code**:
-    To test the code, you can enter the following samples found at the bottom of the dialog.py :
-    Find a Cuban restaurant in the center
-    I want a restaurant in the west
-    I want a moderately priced restaurant
+    To test the code, you can enter the following samples found at the bottom of the dialog.py. The following is an example of the output.
 ```plaintext
-    Example output:
    System: Hello! welcome to restaurant search engine how can I help you?
     User:  Find a Cuban restaurant in the center
    System: In what area are you looking for a restaurant?
@@ -56,9 +52,8 @@ This project is about the development of a restaurant recommendations dialog sys
    System: We found this restaurant for you saint johns chop house
     you want another suggestion?
    User: No
+```
 
-
-7. 
 
 ## Text Classification
 
