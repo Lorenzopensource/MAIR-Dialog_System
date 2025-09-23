@@ -12,4 +12,7 @@
 - **Lorenzo Pasqualotto**: Levenshtein function
 - **Harshavardhani Suresh Kumar**: Lookup function
 
+## Part 1c
+- **Lorenzo Pasqualotto**: Implication Rules
+
 

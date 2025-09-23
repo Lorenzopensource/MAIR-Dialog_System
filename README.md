@@ -86,8 +86,19 @@ To get all the details see the [final report](OVERVIEW.md).
 ### State transition diagram ✅
 We decided to implement the user utterances implicitly in the state transition diagram. This ensures that the diagram remains clear without explicitly repeating the user utterance each time. The first 50 dialogues of the all dialogs were analyzed to find dialogue states and transitions. The examination showed that the three most common transitions were request area, request foodtype, and request price range. In some dialogues, the system asked for confirmation. This means that the choices already made by the user, such as area, food type, and price range, are repeated until they are confirmed by the user. Then the system provided a restaurant suggestion. Subsequently, the user could request information about the restaurant, such as the phone number, postal code, or address. Finally, the conversation ends if the user wants an alternative to the recommended restaurant.
 
-### Dialog management ✅
+## Dialog management ✅
+
+### First Version
+
  ```bash
   python dialog.py
  ```
+
+ ### Inferred properties, configurability ✅
+
+  ```bash
+  python create_new_properties.py
+  python dialog.py
+ ```
+
 
