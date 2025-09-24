@@ -1,11 +1,11 @@
 from sklearn.feature_extraction.text import CountVectorizer
-import pandas
+import pandas as pd
 import joblib
 import Levenshtein
 
 
 def lookup(properties):
-    df = pandas.read_csv("restaurant_info.csv")
+    df = pd.read_csv("restaurant_info.csv")
 
     for key, value in properties.items():
         if key in df.columns:
@@ -34,8 +34,6 @@ def extract_properties(user_input, candidates):
 # post: returns a dictionary with the inferred properties of the restaurant
 #       if a property cannot be inferred it will be set to None
 #       if a property is inconsistent a function should handle the inconsistency (not implemented)
-import pandas as pd
-
 def inferred_properties(restaurant):
     df = pd.read_csv("restaurant_info_new_properties.csv")
     properties = df[df["restaurantname"] == restaurant.lower()]
@@ -80,7 +78,7 @@ def inferred_properties(restaurant):
 
 def agent():
     info = {
-        "context": {"area": "", "food type": "", "price range": ""},
+        "context": {"area": "", "food": "", "pricerange": ""},
         "restaurants": [],
     }
 
@@ -90,6 +88,7 @@ def agent():
     while True:
         state, message = state_transaction_function(state, user_input, info)
         if state == "end":
+            print(message)
             break
 
         user_input = input(f"{message}\n").lower()
@@ -110,17 +109,17 @@ def state_transaction_function(state, user_input, info):
             prices = extract_properties(user_input, valid_priceranges)
 
             if areas:
-                info["context"]["areas"] = areas[0]
+                info["context"]["area"] = areas[0]
             if foods:
-                info["context"]["food type"] = foods[0]
+                info["context"]["food"] = foods[0]
             if prices:
-                info["context"]["price range"] = prices[0]
+                info["context"]["pricerange"] = prices[0]
 
             if not info["context"]["area"]:
                 return "ask_area", "In what area are you looking for a restaurant?"
-            if not info["context"]["food type"]:
+            if not info["context"]["food"]:
                 return "ask_foodtype", "For what food type are you looking?"
-            if not info["context"]["price range"]:
+            if not info["context"]["pricerange"]:
                 return "ask_price", "In what price range are you looking?"
             else:
                 return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food type"]} food in the price range {info["context"]["price range"]} right?"
@@ -132,39 +131,39 @@ def state_transaction_function(state, user_input, info):
         if areas:
             info["context"]["area"] = areas[0]
 
-            if not info["context"]["food type"]:
+            if not info["context"]["food"]:
                 return "ask_foodtype", "For what food type are you looking?"
-            elif not info["context"]["price range"]:
+            elif not info["context"]["pricerange"]:
                 return "ask_price", "In what price range are you looking?"
             else:
-                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food type"]} food in the price range {info["context"]["price range"]} right?"
+                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
         else:
             return "ask_area", "We could not find that area, please try another one"
 
     if state == "ask_foodtype":
         foods = extract_properties(user_input, valid_foodtypes)
         if foods:
-            info["context"]["food type"] = foods[0]
+            info["context"]["food"] = foods[0]
 
             if not info["context"]["area"]:
                 return "ask_area", "In what area are you looking for a restaurant?"
-            elif not info["context"]["price range"]:
+            elif not info["context"]["pricerange"]:
                 return "ask_price", "In what price range are you looking?"
             else:
-                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food type"]} food in the price range {info["context"]["price range"]} right?"
+                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
         else:
             return "ask_foodtype", "We could not find that food type, please try another one"
 
     if state == "ask_price":
         prices = extract_properties(user_input, valid_priceranges)
         if prices:
-            info["context"]["price range"] = prices[0]
+            info["context"]["pricerange"] = prices[0]
             if not info["context"]["area"]:
                 return "ask_area", "In what area are you looking for a restaurant?"
-            elif not info["context"]["food type"]:
+            elif not info["context"]["food"]:
                 return "ask_foodtype", "For what food type are you looking?"
             else:
-                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food type"]} food in the price range {info["context"]["price range"]} right?"
+                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
         else:
             return "ask_price", "We could not find that price range, please try another one"
 
@@ -191,7 +190,7 @@ def state_transaction_function(state, user_input, info):
         prediction = model.predict(vectorized)
 
         if prediction[0] == "affirm":
-            return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food type"]} food in the price range {info["context"]["price range"]} right?"
+            return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
         else:
             return "ask_price", "In what price range are you looking?"
 
@@ -214,7 +213,17 @@ def state_transaction_function(state, user_input, info):
                 agent()
 
         else:
-            return "ask_area", "Sorry for the misunderstanding... In what area you looking for a restaurant?"
+            print("Sorry for the misunderstanding... What did I got wrong? Area, food type or price range?")
+            clarification = min_edit_distance(input().lower(), ["area", "food", "price"])
+            if clarification == "area":
+                return "ask_area", "Got it! In what area are you looking for a restaurant?"
+            elif clarification == "food":
+                return "ask_foodtype", "Got it! For what food type are you looking?"
+            elif clarification == "price":
+                return "ask_price", "Sorry for the misunderstanding... In what price range are you looking?"
+            else:
+                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
+
 
 
 if __name__ == "__main__":
@@ -222,7 +231,7 @@ if __name__ == "__main__":
     model = joblib.load('Utterance_Classifier_NN.pkl')
     vectorizer = joblib.load('Vectorizer_NN.pkl')
 
-    restaurant_infos = pandas.read_csv("restaurant_info.csv")
+    restaurant_infos = pd.read_csv("restaurant_info.csv")
 
     valid_areas = restaurant_infos["area"].dropna().unique().tolist()
     valid_foodtypes = restaurant_infos["food"].dropna().unique().tolist()
