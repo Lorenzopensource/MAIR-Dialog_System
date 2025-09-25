@@ -78,7 +78,7 @@ def inferred_properties(restaurant):
 
 def agent():
     info = {
-        "context": {"area": "", "food": "", "pricerange": ""},
+        "context": {"area": "", "food": "", "pricerange": "" , "addReq": ""},
         "restaurants": [],
     }
 
@@ -198,7 +198,6 @@ def state_transaction_function(state, user_input, info):
         vectorized = vectorizer.transform([user_input])
         prediction = model.predict(vectorized)
 
-
         if prediction[0] == "affirm":
             info["restaurants"] = lookup(info["context"])
 
@@ -206,11 +205,12 @@ def state_transaction_function(state, user_input, info):
                 n = 5 # number of restaurants to show
                 n_restaurants = info["restaurants"][:n] if len(info["restaurants"]) > n else info["restaurants"]
                 print(f"We found these restaurant for you: \n {', '.join(n_restaurants)}")
-                return "end", "Enjoy your meal!" 
+                if info["context"]["addReq"] == " " :
+                    return "ask_add" , "Do you have any additional requirement about the listed restaurants ? /n  Select 1 for touristic restaurants places /n Select 2 for Romantic restaurant places /n Select 3 for Making special resevation for Children /n Select 4 to specify the number of seat to be reserved: /n"
+                else:  return "end", "Enjoy your meal!"
 
             else:
-                print("We could not find a restaurant for you, restarting......")
-                agent()
+                return 'ask_area', "We could not find a restaurant for you, restarting......"
 
         else:
             print("Sorry for the misunderstanding... What did I got wrong? Area, food type or price range?")
@@ -223,6 +223,35 @@ def state_transaction_function(state, user_input, info):
                 return "ask_price", "Sorry for the misunderstanding... In what price range are you looking?"
             else:
                 return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
+            
+    if state == "ask_add":
+        if user_input == 1:
+            info["context"]["addReq"] = "touristic"
+        if user_input == 2:
+            info["context"]["addReq"] = "romantic"
+        if user_input == 3:
+            info["context"]["addReq"] = "children"
+        if user_input == 4 :
+            info["context"]["addReq"] = "assigned_seats"
+        else:
+            return "ask_add","Please enter a valid option"
+        
+        filtered = filter_req(info["restaurants"],info["context"]["addReq"])
+        if not filtered:  return 'ask_add', 'We could not find any restaurant with the specified requirement, please insert a new one.'
+        else: 
+            print(f"We found these restaurant for you: \n {', '.join(filtered)}")
+            return "end", "Enjoy your meal!"
+
+
+
+def filter_req(restaurants,addReq):
+    filtered = []
+    for restaurant in restaurants:
+        if inferred_properties(restaurant)[addReq]:
+            filtered.append(restaurant)
+    return filtered
+
+         
 
 
 
