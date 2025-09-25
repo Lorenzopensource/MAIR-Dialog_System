@@ -74,7 +74,15 @@ def inferred_properties(restaurant):
 
     return inferred
 
-
+def handleInconsistency(restaurant,add_req):
+    df = pd.read_csv("restaurant_info_new_properties.csv")
+    properties = df[df["restaurantname"] == restaurant.lower()]
+    if properties["food"].eq("romanian").any() and add_req == "touristic":
+        return [True, "Romanian cuisine is unknown for most tourists and they prefer familiar food"]
+    if add_req == "children" and properties["lengthofstay"].eq("long").any():
+        return [True, "Spending a long time in a restaurant is not advised when taking children"]
+    if properties["crowdness"].eq("busy").any() and add_req == "romantic":
+        return [True, "A busy restaurant is not romantic"]
 
 def agent():
     info = {
@@ -281,4 +289,8 @@ if __name__ == "__main__":
 
 #    print(inferred_properties("the gardenia"))
 
+#    print(inferred_properties("the gardenia"))
+#    inconistency, message = handleInconsistency("yu garden", "romantic")
+#    print(message)
+     
 # ---      ---
