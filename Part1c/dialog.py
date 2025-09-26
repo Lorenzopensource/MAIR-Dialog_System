@@ -164,11 +164,20 @@ def log(message, cap, delay):
     else:
         print(message)
 
+def handleInconsistency(restaurant, add_req):
+    df = pd.read_csv("restaurant_info_new_properties.csv")
+    properties = df[df["restaurantname"] == restaurant.lower()]
+    if properties["food"].eq("romanian").any() and add_req == "touristic":
+        return [True, "Romanian cuisine is unknown for most tourists and they prefer familiar food"]
+    if add_req == "children" and properties["lengthofstay"].eq("long").any():
+        return [True, "Spending a long time in a restaurant is not advised when taking children"]
+    if properties["crowdness"].eq("busy").any() and add_req == "romantic":
+        return [True, "A busy restaurant is not romantic"]
 
 
 def agent():
     info = {
-        "context": {"area": "", "food": "", "pricerange": ""},
+        "context": {"area": "", "food": "", "pricerange": "", "addReq": ""},
         "restaurants": [],
     }
 
@@ -332,7 +341,10 @@ def state_transaction_function(state, user_input, info, cap, delay):
                 n = 5  # number of restaurants to show
                 n_restaurants = info["restaurants"][:n] if len(info["restaurants"]) > n else info["restaurants"]
                 log(f"We found these restaurant for you: \n {', '.join(n_restaurants)}", cap , delay)
-                return "end", "Enjoy your meal!"
+                if info["context"]["addReq"] == " " :
+                    return "ask_add" , "Do you have any additional requirement about the listed restaurants ? /n  Select 1 for touristic restaurants places /n Select 2 for Romantic restaurant places /n Select 3 for Making special resevation for Children /n Select 4 to specify the number of seat to be reserved: /n"
+                else:
+                    return "end", "Enjoy your meal!"
 
             else:
                 return "end", "We could not find a restaurant for you restarting if possible!"
@@ -348,6 +360,33 @@ def state_transaction_function(state, user_input, info, cap, delay):
                 return "ask_price", "Sorry for the misunderstanding... In what price range are you looking?"
             else:
                 return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
+
+    if state == "ask_add":
+        if user_input == 1:
+            info["context"]["addReq"] = "touristic"
+        if user_input == 2:
+            info["context"]["addReq"] = "romantic"
+        if user_input == 3:
+            info["context"]["addReq"] = "children"
+        if user_input == 4:
+            info["context"]["addReq"] = "assigned_seats"
+        else:
+            return "ask_add", "Please enter a valid option"
+
+        filtered = filter_req(info["restaurants"], info["context"]["addReq"])
+        if not filtered:
+            return 'ask_add', 'We could not find any restaurant with the specified requirement, please insert a new one.'
+        else:
+            print(f"We found these restaurant for you: \n {', '.join(filtered)}")
+            return "end", "Enjoy your meal!"
+
+
+def filter_req(restaurants,addReq):
+    filtered = []
+    for restaurant in restaurants:
+        if inferred_properties(restaurant)[addReq]:
+            filtered.append(restaurant)
+    return filtered
 
 
 if __name__ == "__main__":
