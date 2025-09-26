@@ -15,5 +15,6 @@
 ## Part 1c
 - **Lorenzo Pasqualotto**: Implication Rules
 - **Ecenaz Rizeli**: Update Flow Diagram
+- **Daan van Dijk**: Implemented 4 features
 
 

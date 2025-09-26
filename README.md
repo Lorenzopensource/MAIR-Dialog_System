@@ -101,4 +101,11 @@ We decided to implement the user utterances implicitly in the state transition d
   python dialog.py
  ```
 
+### New features for part 1C
+- Output in CAP or not
+- Delay in response or not
+- Allow restarts or not
+- Modify all the modifications 
+- Modify the preferences
+
 
