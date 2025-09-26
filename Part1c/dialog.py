@@ -31,50 +31,63 @@ def extract_properties(user_input, candidates):
 
     return list(set(extracted))
 
-
-# pre: restaurant is a string with the restaurant name
-# post: returns a dictionary with the inferred properties of the restaurant
-#       if a property cannot be inferred it will be set to None
-#       if a property is inconsistent a function should handle the inconsistency (not implemented)
-def inferred_properties(restaurant):
+# pre: restaurant is a name of a restaurant, addReq is one of the additional requirements
+# post: returns "Yes" if the restaurant satisfies the additional requirement, "No" if it does not, "Unknown" if it cannot be inferred
+#       "Inconsistency" if the properties of the restaurant lead to an inconsistency
+def has_inferred_property(restaurant, add_req):
     df = pd.read_csv("restaurant_info_new_properties.csv")
     properties = df[df["restaurantname"] == restaurant.lower()]
-    inferred = {"touristic": None, "romantic": None, "children": None, "assigned_seats": None}
-
-    if properties.empty:
-        return inferred
-
-    # Rule 1
-    if (properties["pricerange"].eq("cheap").any() and properties["foodquality"].eq("good").any()):
-        inferred["touristic"] = True
-
-    # Rule 2
-    if properties["food"].eq("romanian").any():
-        if inferred["touristic"] is True:
-            print("Rule 2 is creating an inconsistency")  # handleInconsistency()
+    if add_req == "touristic":
+        # Rule 1: "If a restaurant is cheap and has good food quality then it is touristic"
+        if properties["pricerange"].eq("cheap").any() and properties["foodquality"].eq("good").any():
+            # Check for internal inconsistencies
+            # Rule 2: "If a restaurant serves Romanian food then it is not touristic"
+            if properties["food"].eq("romanian").any():
+                return "Inconsistency"
+            return "Yes"
+        elif properties["food"].eq("romanian").any():
+            return "No"
         else:
-            inferred["touristic"] = False
-
-    # Rule 3
-    if properties["crowdness"].eq("busy").any():
-        inferred["assigned_seats"] = True
-
-    # Rule 4
-    if properties["lengthofstay"].eq("long").any():
-        inferred["children"] = False
-
-    # Rule 5
-    if properties["crowdness"].eq("busy").any():
-        inferred["romantic"] = False
-
-    # Rule 6
-    if properties["lengthofstay"].eq("long").any():
-        if inferred["romantic"] is False:
-            print("Rule 6 is creating an inconsistency")  # handleInconsistency()
+            return "Unknown"
+    if add_req == "romantic":
+        # Rule 5: "If a restaurant is busy then it is not romantic",
+        if properties["crowdness"].eq("busy").any():
+            return "No"
+        # Rule 6: "If a restaurant has a long length of stay then it is romantic",
+        if properties["lengthofstay"].eq("long").any():
+            return "Yes"
         else:
-            inferred["romantic"] = True
+            return "Unknown"
+    if add_req == "children":
+        # Rule 4: "If a restaurant has a long length of stay then it is not suitable for children",
+        if properties["lengthofstay"].eq("long").any():
+            return "No"
+        else:
+            return "Unknown"
+    if add_req == "assigned_seats":
+        # Rule 3: "If a restaurant is busy then it provides assigned seats"
+        if properties["crowdness"].eq("busy").any():
+            return "Yes"
+        else:
+            return "Unknown"
+    return "Unknown"    
 
-    return inferred
+# pre: restaurants is a list of restaurant names, addReq is one of the additional requirements
+# post: returns True and a restaurant name if there is at least one restaurant satisfying the additional requirement
+#       returns False and a message if no restaurant satisfies the additional requirement or if there is an inconsistency
+def filter_add_req(restaurants,addReq):
+    checks = []
+    for restaurant in restaurants:
+        checks.append(has_inferred_property(restaurant,addReq))
+    inconsistency = False
+    for i in range(len(restaurants)):
+        if checks[i] == "Yes":
+            return True, restaurants[i]
+        if checks[i] == "Inconsistency":
+            inconsistency = True
+    if inconsistency:
+        return False,"The additional requirement cannot be determined for the selected restaurants, please specify another onet"
+    return False,"We could not find any restaurant with the specified requirement, please insert a new one."
 
 
 def set_configs():
@@ -163,17 +176,6 @@ def log(message, cap, delay):
         print(message.upper())
     else:
         print(message)
-
-def handleInconsistency(restaurant, add_req):
-    df = pd.read_csv("restaurant_info_new_properties.csv")
-    properties = df[df["restaurantname"] == restaurant.lower()]
-    if properties["food"].eq("romanian").any() and add_req == "touristic":
-        return [True, "Romanian cuisine is unknown for most tourists and they prefer familiar food"]
-    if add_req == "children" and properties["lengthofstay"].eq("long").any():
-        return [True, "Spending a long time in a restaurant is not advised when taking children"]
-    if properties["crowdness"].eq("busy").any() and add_req == "romantic":
-        return [True, "A busy restaurant is not romantic"]
-
 
 def agent():
     info = {
@@ -340,14 +342,15 @@ def state_transaction_function(state, user_input, info, cap, delay):
             if info["restaurants"]:
                 n = 5  # number of restaurants to show
                 n_restaurants = info["restaurants"][:n] if len(info["restaurants"]) > n else info["restaurants"]
-                log(f"We found these restaurant for you: \n {', '.join(n_restaurants)}", cap , delay)
-                if info["context"]["addReq"] == " " :
-                    return "ask_add" , "Do you have any additional requirement about the listed restaurants ? /n  Select 1 for touristic restaurants places /n Select 2 for Romantic restaurant places /n Select 3 for Making special resevation for Children /n Select 4 to specify the number of seat to be reserved: /n"
+                log(f"\n We found these restaurant for you: \n================================================================  \n {', '.join(n_restaurants)} \n================================================================  \n", cap , delay)
+                if info["context"]["addReq"] == "" :
+                    return "ask_add" , "Do you have any additional requirement? \n Type 1 for the touristic restaurants \n Type 2 for the romantic ones\n Type 3 if you would like them to be for children  \n Type 4 if you want those who provide assigned seats  \n"
                 else:
                     return "end", "Enjoy your meal!"
 
             else:
-                return "end", "We could not find a restaurant for you restarting if possible!"
+                info["context"] = {"area": "", "food": "", "pricerange": "", "addReq": ""}
+                return "ask_area", "We could not find a restaurant for you! Let's start again! \n In what area are you looking for a restaurant?"
 
         else:
             log("Sorry for the misunderstanding... What did I got wrong? Area, food type or price range?", cap, delay)
@@ -357,37 +360,49 @@ def state_transaction_function(state, user_input, info, cap, delay):
             elif clarification == "food":
                 return "ask_foodtype", "Got it! For what food type are you looking?"
             elif clarification == "price":
-                return "ask_price", "Sorry for the misunderstanding... In what price range are you looking?"
+                return "ask_price", "Got it! What price range do you prefer?"
             else:
                 return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
 
     if state == "ask_add":
-        if user_input == 1:
+        if user_input == "1":
             info["context"]["addReq"] = "touristic"
-        if user_input == 2:
+        elif user_input == "2":
             info["context"]["addReq"] = "romantic"
-        if user_input == 3:
+        elif user_input == "3":
             info["context"]["addReq"] = "children"
-        if user_input == 4:
+        elif user_input == "4":
             info["context"]["addReq"] = "assigned_seats"
         else:
             return "ask_add", "Please enter a valid option"
 
-        filtered = filter_req(info["restaurants"], info["context"]["addReq"])
-        if not filtered:
-            return 'ask_add', 'We could not find any restaurant with the specified requirement, please insert a new one.'
+        found, text = filter_add_req(info["restaurants"], info["context"]["addReq"])
+        if not found:
+            return 'ask_add', text
         else:
-            print(f"We found these restaurant for you: \n {', '.join(filtered)}")
-            return "end", "Enjoy your meal!"
+            print(f' \nWe found this restaurant for you: \n================================================================ \n  {text} \n================================================================ \n')
+            return "provide_info", "Would you like any information about the restaurant? \n - Type 1 for phone number \n - Type 2 for address \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
+        
+    if state == "provide_info":
+        df = pd.read_csv("restaurant_info.csv")
+        restaurant_name = filter_add_req(info["restaurants"], info["context"]["addReq"])[1]
 
+        restaurant_infos = df[df["restaurantname"] == restaurant_name.lower()]
 
-def filter_req(restaurants,addReq):
-    filtered = []
-    for restaurant in restaurants:
-        if inferred_properties(restaurant)[addReq]:
-            filtered.append(restaurant)
-    return filtered
-
+        if user_input == "1":
+            print(f"\n================================================================ \n  The phone number of the restaurant is: {restaurant_infos['phone'].values[0]}. \n================================================================ \n ")
+            return "provide_info", "Do you want any other information? \n - Type 2 for address \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
+        elif user_input == "2":
+            print(f"\n================================================================ \n  The address of the restaurant is: {restaurant_infos['addr'].values[0]}. \n================================================================ \n ")
+            return "provide_info",  "Do you want any other information? \n - Type 1 for phone number \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
+        elif user_input == "3":
+            print(f"\n================================================================ \n  The postcode of the restaurant is: {restaurant_infos['postcode'].values[0]}. \n================================================================ \n ")
+            return "provide_info", "Do you want any other information? \n - Type 1 for phone number \n - Type 2 for address \n - Type 4 for all of them \n - Type any other character to exit the system \n"
+        elif user_input == "4":
+            print(f"\n================================================================ \nPhone number: {restaurant_infos['phone'].values[0]} \nAddress: {restaurant_infos['addr'].values[0]} \nPostcode: {restaurant_infos['postcode'].values[0]} \n================================================================ \n " )
+            return "end","Thank you for using our services, goodbye!"
+        else:
+            return "end", "Thank you for using our services, goodbye!"
 
 if __name__ == "__main__":
     model = joblib.load('Utterance_Classifier_NN.pkl')
