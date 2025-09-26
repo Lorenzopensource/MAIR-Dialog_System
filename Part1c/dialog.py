@@ -2,6 +2,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
 import joblib
 import Levenshtein
+import time
 
 
 def lookup(properties):
@@ -30,6 +31,7 @@ def extract_properties(user_input, candidates):
 
     return list(set(extracted))
 
+
 # pre: restaurant is a string with the restaurant name
 # post: returns a dictionary with the inferred properties of the restaurant
 #       if a property cannot be inferred it will be set to None
@@ -43,13 +45,13 @@ def inferred_properties(restaurant):
         return inferred
 
     # Rule 1
-    if (properties["pricerange"].eq("cheap").any()  and properties["foodquality"].eq("good").any()):
+    if (properties["pricerange"].eq("cheap").any() and properties["foodquality"].eq("good").any()):
         inferred["touristic"] = True
 
     # Rule 2
     if properties["food"].eq("romanian").any():
         if inferred["touristic"] is True:
-            print("Rule 2 is creating an inconsistency") # handleInconsistency()
+            print("Rule 2 is creating an inconsistency")  # handleInconsistency()
         else:
             inferred["touristic"] = False
 
@@ -66,44 +68,161 @@ def inferred_properties(restaurant):
         inferred["romantic"] = False
 
     # Rule 6
-    if properties["lengthofstay"].eq("long").any():  
+    if properties["lengthofstay"].eq("long").any():
         if inferred["romantic"] is False:
-            print("Rule 6 is creating an inconsistency") # handleInconsistency()
+            print("Rule 6 is creating an inconsistency")  # handleInconsistency()
         else:
             inferred["romantic"] = True
 
     return inferred
 
-def handleInconsistency(restaurant,add_req):
-    df = pd.read_csv("restaurant_info_new_properties.csv")
-    properties = df[df["restaurantname"] == restaurant.lower()]
-    if properties["food"].eq("romanian").any() and add_req == "touristic":
-        return [True, "Romanian cuisine is unknown for most tourists and they prefer familiar food"]
-    if add_req == "children" and properties["lengthofstay"].eq("long").any():
-        return [True, "Spending a long time in a restaurant is not advised when taking children"]
-    if properties["crowdness"].eq("busy").any() and add_req == "romantic":
-        return [True, "A busy restaurant is not romantic"]
+
+def set_configs():
+    restarts, delay, cap = False, False, False
+
+    answer = input("Do you want to allow restarts?")
+
+    vectorized = vectorizer.transform([answer])
+    prediction = model.predict(vectorized)
+
+    # Feature: allow restarts
+    if prediction[0] == "affirm":
+        restarts = True
+
+    answer = input("Do you want a small delay in the response?")
+
+    vectorized = vectorizer.transform([answer])
+    prediction = model.predict(vectorized)
+
+    # Feature: Return every output in caps lock
+    if prediction[0] == "affirm":
+        delay = True
+
+    answer = input("Do you the output in CAP?")
+
+    vectorized = vectorizer.transform([answer])
+    prediction = model.predict(vectorized)
+
+    # Feature: Return every output in caps lock
+    if prediction[0] == "affirm":
+        cap = True
+
+    return restarts, delay, cap
+
+
+def modify_preferences(info, cap, delay):
+    if delay:
+        time.sleep(1)
+
+    if cap:
+        user_input = input("Which preference do you want to change (area / food type / price range)?".upper())
+    else:
+        user_input = input("Which preference do you want to change (area / food type / price range)?")
+
+    if user_input in ["food", "food type"]:
+        user_input = "food type"
+    elif user_input in ["price", "price range"]:
+        user_input = "price range"
+    elif user_input == "area":
+        user_input = "area"
+    else:
+        log("Invalid choice. Please select 'area', 'food type', or 'price range'.", cap, delay)
+        return info
+
+    mapping = {
+        "area": ("area", valid_areas),
+        "food type": ("food", valid_foodtypes),
+        "price range": ("pricerange", valid_priceranges),
+    }
+
+    key, candidates = mapping[user_input]
+
+    if delay:
+        time.sleep(1)
+    if cap:
+        new_value = input(f"Please enter the new {user_input}:".upper())
+    else:
+        new_value = input(f"Please enter the new {user_input}:\n")
+
+    match = min_edit_distance(new_value, candidates)
+
+    if not match:
+        print(f"Sorry, we could not recognize that {user_input}. Keeping the old value.")
+        return info
+
+    info["context"][key] = match
+    print(f"{user_input} updated to: {match}")
+
+    return info
+
+
+def log(message, cap, delay):
+    if delay:
+        time.sleep(1)
+    if cap:
+        print(message.upper())
+    else:
+        print(message)
+
+
 
 def agent():
     info = {
-        "context": {"area": "", "food": "", "pricerange": "" , "addReq": ""},
+        "context": {"area": "", "food": "", "pricerange": ""},
         "restaurants": [],
     }
 
     state = "start"
     user_input = ""
 
+    # Ask the modifications of the agent
+    print("Please first set the right modifications of the restaurant recommendation engine")
+
+    restarts, delay, cap = set_configs()
+
+    log("Answer 'c' if you want to change the modifications, 'r' if you want to restart and 'm' if you want to modify your preferences",cap, delay)
+
+    # Feature: add a small delay to the response
     while True:
-        state, message = state_transaction_function(state, user_input, info)
+        oldstate = state
+
+        state, message = state_transaction_function(state, user_input, info, cap, delay)
         if state == "end":
-            print(message)
+            log(message, cap, delay)
+
+            if restarts:
+                log("Restarting.....", cap, delay)
+
             break
 
-        user_input = input(f"{message}\n").lower()
+        if delay:
+            time.sleep(1)
+        if cap:
+            message = message.upper()
+
+        user_input = input(f"{message}\n")
+
+        if user_input == "c":
+            restarts, delay, cap = set_configs()
+            state = oldstate
+            continue
+
+        if user_input == "m":
+            info = modify_preferences(info, cap, delay)
+            user_input = ""
+            state = "introduction"
+            continue
+
+        if user_input == "r":
+            if not restarts:
+                log("Restarting not allowed quiting....", cap, delay)
+                break
+            else:
+                log("Restarting...", cap, delay)
+                agent()
 
 
-def state_transaction_function(state, user_input, info):
-
+def state_transaction_function(state, user_input, info, cap, delay):
     if state == "start":
         return "introduction", "Hello! welcome to restaurant search engine how can I help you?"
 
@@ -210,18 +329,16 @@ def state_transaction_function(state, user_input, info):
             info["restaurants"] = lookup(info["context"])
 
             if info["restaurants"]:
-                n = 5 # number of restaurants to show
+                n = 5  # number of restaurants to show
                 n_restaurants = info["restaurants"][:n] if len(info["restaurants"]) > n else info["restaurants"]
-                print(f"We found these restaurant for you: \n {', '.join(n_restaurants)}")
-                if info["context"]["addReq"] == " " :
-                    return "ask_add" , "Do you have any additional requirement about the listed restaurants ? /n  Select 1 for touristic restaurants places /n Select 2 for Romantic restaurant places /n Select 3 for Making special resevation for Children /n Select 4 to specify the number of seat to be reserved: /n"
-                else:  return "end", "Enjoy your meal!"
+                log(f"We found these restaurant for you: \n {', '.join(n_restaurants)}", cap , delay)
+                return "end", "Enjoy your meal!"
 
             else:
-                return 'ask_area', "We could not find a restaurant for you, restarting......"
+                return "end", "We could not find a restaurant for you restarting if possible!"
 
         else:
-            print("Sorry for the misunderstanding... What did I got wrong? Area, food type or price range?")
+            log("Sorry for the misunderstanding... What did I got wrong? Area, food type or price range?", cap, delay)
             clarification = min_edit_distance(input().lower(), ["area", "food", "price"])
             if clarification == "area":
                 return "ask_area", "Got it! In what area are you looking for a restaurant?"
@@ -231,40 +348,9 @@ def state_transaction_function(state, user_input, info):
                 return "ask_price", "Sorry for the misunderstanding... In what price range are you looking?"
             else:
                 return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
-            
-    if state == "ask_add":
-        if user_input == 1:
-            info["context"]["addReq"] = "touristic"
-        if user_input == 2:
-            info["context"]["addReq"] = "romantic"
-        if user_input == 3:
-            info["context"]["addReq"] = "children"
-        if user_input == 4 :
-            info["context"]["addReq"] = "assigned_seats"
-        else:
-            return "ask_add","Please enter a valid option"
-        
-        filtered = filter_req(info["restaurants"],info["context"]["addReq"])
-        if not filtered:  return 'ask_add', 'We could not find any restaurant with the specified requirement, please insert a new one.'
-        else: 
-            print(f"We found these restaurant for you: \n {', '.join(filtered)}")
-            return "end", "Enjoy your meal!"
-
-
-
-def filter_req(restaurants,addReq):
-    filtered = []
-    for restaurant in restaurants:
-        if inferred_properties(restaurant)[addReq]:
-            filtered.append(restaurant)
-    return filtered
-
-         
-
 
 
 if __name__ == "__main__":
-
     model = joblib.load('Utterance_Classifier_NN.pkl')
     vectorizer = joblib.load('Vectorizer_NN.pkl')
 
@@ -275,22 +361,3 @@ if __name__ == "__main__":
     valid_priceranges = restaurant_infos["pricerange"].dropna().unique().tolist()
 
     agent()
-
-# --- TESTS ---
-#
-#    input="Find a Cuban restaurant in the center"
-#    print(extract_properties(input, valid_foodtypes))
-#
-#    input="I want a restaurant in the west"
-#    print(extract_property(input, valid_areas))
-#
-#    input="I want a moderately priced restaurant "
-#    print(extract_property(input, valid_priceranges))
-
-#    print(inferred_properties("the gardenia"))
-
-#    print(inferred_properties("the gardenia"))
-#    inconistency, message = handleInconsistency("yu garden", "romantic")
-#    print(message)
-     
-# ---      ---
