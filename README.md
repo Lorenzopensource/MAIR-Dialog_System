@@ -43,7 +43,6 @@ This project is about the development of a restaurant recommendations dialog sys
  ```
 6. **An example output of the dialog system**:
 ```plaintext
-   ```plaintext
    System: Please first set the right modifications of the restaurant recommendation engine
    Do you want to allow restarts?
    User: yes
