@@ -42,21 +42,67 @@ This project is about the development of a restaurant recommendations dialog sys
    python dialog.py
  ```
 6. **An example output of the dialog system**:
-    To test the code, you can enter the following samples found at the bottom of the dialog.py. The following is an example of the output.
 ```plaintext
-   System: Hello! welcome to restaurant search engine how can I help you?
-    User:  Find a Cuban restaurant in the center
-   System: In what area are you looking for a restaurant?
-    User:  I want a restaurant in the west
-   System: In what price range are you looking?
-    User:  I want a moderately priced restaurant
-    hierrrrrr
-   System: So you are looking for a restaurant in west with thai food in the price range moderate right?
-    User:  Yes
-   System: We found this restaurant for you saint johns chop house
-    you want another suggestion?
-    User:  No
+   ```plaintext
+   System: Please first set the right modifications of the restaurant recommendation engine
+   Do you want to allow restarts?
+   User: yes
+   System: Do you want a small delay in the response?
+   User: yes
+   System: Do you the output in CAP?
+   User: yes
+   System: ANSWER 'C' IF YOU WANT TO CHANGE THE MODIFICATIONS, 'R' IF YOU WANT TO RESTART AND 'M' IF YOU WANT TO MODIFY       YOUR PREFERENCES
+   HELLO! WELCOME TO RESTAURANT SEARCH ENGINE HOW CAN I HELP YOU?
+   User: I am looking for an indian restaurant
+   System: IN WHAT AREA ARE YOU LOOKING FOR A RESTAURANT?
+   User: north
+   System: IN WHAT PRICE RANGE ARE YOU LOOKING?
+   User: moderate
+   System: SO YOU ARE LOOKING FOR A RESTAURANT IN NORTH WITH INDIAN FOOD IN THE PRICE RANGE MODERATE RIGHT?
+   User: yes
+
+   WE FOUND THESE RESTAURANT FOR YOU:
+   ================================================================
+    MEGHNA, THE NIRALA, TANDOORI PALACE, GRAFFITI
+   ================================================================
+
+   DO YOU HAVE ANY ADDITIONAL REQUIREMENT? 
+   TYPE 1 FOR THE TOURISTIC RESTAURANTS
+   TYPE 2 FOR THE ROMANTIC ONES
+   TYPE 3 IF YOU WOULD LIKE THEM TO BE FOR CHILDREN
+   TYPE 4 IF YOU WANT THOSE WHO PROVIDE ASSIGNED SEATS
+
+  User: 2
+ 
+  System: We found this restaurant for you:
+  ================================================================
+   the nirala
+  ================================================================
+
+  WOULD YOU LIKE ANY INFORMATION ABOUT THE RESTAURANT? 
+  - TYPE 1 FOR PHONE NUMBER
+  - TYPE 2 FOR ADDRESS
+  - TYPE 3 FOR POSTCODE
+  - TYPE 4 FOR ALL OF THEM
+  - TYPE ANY OTHER CHARACTER TO EXIT THE SYSTEM
+
+  User: 1
+
+  ================================================================
+  The phone number of the restaurant is: 01223 360966.
+  ================================================================
+
+  DO YOU WANT ANY OTHER INFORMATION? 
+  - TYPE 2 FOR ADDRESS
+  - TYPE 3 FOR POSTCODE
+  - TYPE 4 FOR ALL OF THEM
+  - TYPE ANY OTHER CHARACTER TO EXIT THE SYSTEM
+
+  User: X
+  THANK YOU FOR USING OUR SERVICES, GOODBYE!
+  RESTARTING.....
 ```
+
 
 
 ## Text Classification
