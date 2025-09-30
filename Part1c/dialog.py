@@ -26,7 +26,7 @@ def extract_properties(user_input, candidates):
     extracted = []
 
     for w in words:
-        if any(Levenshtein.distance(w, p.lower()) <= 2 for p in candidates):
+        if any(Levenshtein.distance(w, p.lower()) <= 1 for p in candidates):
             extracted.append(min_edit_distance(w, candidates))
 
     return list(set(extracted))
@@ -111,7 +111,7 @@ def set_configs():
     if prediction[0] == "affirm":
         delay = True
 
-    answer = input("Do you the output in CAP?")
+    answer = input("Do you want the output in CAP?")
 
     vectorized = vectorizer.transform([answer])
     prediction = model.predict(vectorized)
@@ -260,7 +260,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
             if not info["context"]["pricerange"]:
                 return "ask_price", "In what price range are you looking?"
             else:
-                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food type"]} food in the price range {info["context"]["price range"]} right?"
+                return "confirmation", f"So you are looking for a restaurant in {info['context']['area']} with {info['context']['food']} food in the price range {info['context']['pricerange']} right?"
         else:
             return "introduction", "Sorry we can't do that, try again please"
 
@@ -274,7 +274,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
             elif not info["context"]["pricerange"]:
                 return "ask_price", "In what price range are you looking?"
             else:
-                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
+                return "confirmation", f"So you are looking for a restaurant in {info['context']['area']} with {info['context']['food']} food in the price range {info['context']['pricerange']} right?"
         else:
             return "ask_area", "We could not find that area, please try another one"
 
@@ -288,7 +288,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
             elif not info["context"]["pricerange"]:
                 return "ask_price", "In what price range are you looking?"
             else:
-                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
+                return "confirmation", f"So you are looking for a restaurant in {info['context']['area']} with {info['context']['food']} food in the price range {info['context']['pricerange']} right?"
         else:
             return "ask_foodtype", "We could not find that food type, please try another one"
 
@@ -301,7 +301,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
             elif not info["context"]["food"]:
                 return "ask_foodtype", "For what food type are you looking?"
             else:
-                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
+                return "confirmation", f"So you are looking for a restaurant in {info['context']['area']} with {info['context']['food']} food in the price range {info['context']['pricerange']} right?"
         else:
             return "ask_price", "We could not find that price range, please try another one"
 
@@ -328,7 +328,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
         prediction = model.predict(vectorized)
 
         if prediction[0] == "affirm":
-            return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
+            return "confirmation", f"So you are looking for a restaurant in {info['context']['area']} with {info['context']['food']} food in the price range {info['context']['pricerange']} right?"
         else:
             return "ask_price", "In what price range are you looking?"
 
@@ -362,7 +362,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
             elif clarification == "price":
                 return "ask_price", "Got it! What price range do you prefer?"
             else:
-                return "confirmation", f"So you are looking for a restaurant in {info["context"]["area"]} with {info["context"]["food"]} food in the price range {info["context"]["pricerange"]} right?"
+                return "confirmation", f"So you are looking for a restaurant in {info['context']['area']} with {info['context']['food']} food in the price range {info['context']['pricerange']} right?"
 
     if state == "ask_add":
         if user_input == "1":
