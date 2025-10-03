@@ -101,7 +101,15 @@ This project is about the development of a restaurant recommendations dialog sys
   THANK YOU FOR USING OUR SERVICES, GOODBYE!
   RESTARTING.....
 ```
+### Path Assumption
 
+To avoid path dependencies problems, it is assumed that the function are runned inside the dedicated folder.
+For example, to execute the final version of the dialog system, assuming you are currently on the root folder of the repo, run on your terminal:
+
+ ```bash
+   cd Part1c
+   python dialog.py
+ ```
 
 
 ## Text Classification

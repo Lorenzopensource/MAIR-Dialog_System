@@ -4,17 +4,22 @@ import joblib
 import Levenshtein
 import time
 
-
+# pre: properties is a dictionary with keys as column names and values as the desired values for those columns
+# post: returns a list of restaurant names that match the given properties
 def lookup(properties):
     df = pd.read_csv("restaurant_info.csv")
 
     for key, value in properties.items():
-        if key in df.columns:
+        if value == "any":
+            continue
+        elif key in df.columns:
             df = df[df[key].str.lower() == value]
 
     return df["restaurantname"].tolist()
 
 
+# pre: word is a string, candidates is a list of strings
+# post: returns the candidate with the minimum edit distance to the word
 def min_edit_distance(word, candidates):
     candidates = [c.lower() for c in candidates]
     distances = [(c, Levenshtein.distance(word, c)) for c in candidates]
@@ -49,28 +54,31 @@ def has_inferred_property(restaurant, add_req):
             return "No"
         else:
             return "Unknown"
-    if add_req == "romantic":
+    elif add_req == "romantic":
         # Rule 5: "If a restaurant is busy then it is not romantic",
         if properties["crowdness"].eq("busy").any():
-            return "No"
-        # Rule 6: "If a restaurant has a long length of stay then it is romantic",
-        if properties["lengthofstay"].eq("long").any():
+            # Check for internal inconsistencies
+            # Rule 6: "If a restaurant has a long length of stay then it is romantic",
+            if properties["lengthofstay"].eq("long").any():
+                return "Inconsistency"
             return "Yes"
+        elif properties["lengthofstay"].eq("long").any():
+            return "No"
         else:
             return "Unknown"
-    if add_req == "children":
+    elif add_req == "children":
         # Rule 4: "If a restaurant has a long length of stay then it is not suitable for children",
         if properties["lengthofstay"].eq("long").any():
             return "No"
         else:
             return "Unknown"
-    if add_req == "assigned_seats":
+    elif add_req == "assigned_seats":
         # Rule 3: "If a restaurant is busy then it provides assigned seats"
         if properties["crowdness"].eq("busy").any():
             return "Yes"
         else:
             return "Unknown"
-    return "Unknown"    
+    else: return "Unknown"    
 
 # pre: restaurants is a list of restaurant names, addReq is one of the additional requirements
 # post: returns True and a restaurant name if there is at least one restaurant satisfying the additional requirement
@@ -86,10 +94,10 @@ def filter_add_req(restaurants,addReq):
         if checks[i] == "Inconsistency":
             inconsistency = True
     if inconsistency:
-        return False,"The additional requirement cannot be determined for the selected restaurants, please specify another onet"
+        return False,"The additional requirement cannot be determined for the selected restaurants, please specify another one"
     return False,"We could not find any restaurant with the specified requirement, please insert a new one."
 
-
+# Ask the user for the configurations of the dialog system
 def set_configs():
     restarts, delay, cap = False, False, False
 
@@ -122,7 +130,7 @@ def set_configs():
 
     return restarts, delay, cap
 
-
+# Allow the user to modify their preferences
 def modify_preferences(info, cap, delay):
     if delay:
         time.sleep(1)
@@ -168,7 +176,7 @@ def modify_preferences(info, cap, delay):
 
     return info
 
-
+# Log messages with optional capitalization and delay
 def log(message, cap, delay):
     if delay:
         time.sleep(1)
@@ -177,6 +185,7 @@ def log(message, cap, delay):
     else:
         print(message)
 
+# Main dialog function
 def agent():
     info = {
         "context": {"area": "", "food": "", "pricerange": "", "addReq": ""},
@@ -187,11 +196,11 @@ def agent():
     user_input = ""
 
     # Ask the modifications of the agent
-    print("Please first set the right modifications of the restaurant recommendation engine")
+    print("\n================================================================ \nCONFIGURE YOUR PREFERENCES \n================================================================ \n ")
 
     restarts, delay, cap = set_configs()
 
-    log("Answer 'c' if you want to change the modifications, 'r' if you want to restart and 'm' if you want to modify your preferences",cap, delay)
+    log("\nAnswer 'c' if you want to change the modifications, 'r' if you want to restart and 'm' if you want to modify your preferences \n \n================================================================ \nDIALOG \n================================================================ \n",cap, delay)
 
     # Feature: add a small delay to the response
     while True:
@@ -232,7 +241,7 @@ def agent():
                 log("Restarting...", cap, delay)
                 agent()
 
-
+# State transition function
 def state_transaction_function(state, user_input, info, cap, delay):
     if state == "start":
         return "introduction", "Hello! welcome to restaurant search engine how can I help you?"
@@ -342,7 +351,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
             if info["restaurants"]:
                 n = 5  # number of restaurants to show
                 n_restaurants = info["restaurants"][:n] if len(info["restaurants"]) > n else info["restaurants"]
-                log(f"\n We found these restaurant for you: \n================================================================  \n {', '.join(n_restaurants)} \n================================================================  \n", cap , delay)
+                log(f"\n We found these restaurants for you: \n================================================================  \n {', '.join(n_restaurants)} \n================================================================  \n", cap , delay)
                 if info["context"]["addReq"] == "" :
                     return "ask_add" , "Do you have any additional requirement? \n Type 1 for the touristic restaurants \n Type 2 for the romantic ones\n Type 3 if you would like them to be for children  \n Type 4 if you want those who provide assigned seats  \n"
                 else:
@@ -350,7 +359,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
 
             else:
                 info["context"] = {"area": "", "food": "", "pricerange": "", "addReq": ""}
-                return "ask_area", "We could not find a restaurant for you! Let's start again! \n In what area are you looking for a restaurant?"
+                return "ask_area", "We could not find a restaurant for you! Let's start again! \nIn what area are you looking for a restaurant?"
 
         else:
             log("Sorry for the misunderstanding... What did I got wrong? Area, food type or price range?", cap, delay)
@@ -413,5 +422,9 @@ if __name__ == "__main__":
     valid_areas = restaurant_infos["area"].dropna().unique().tolist()
     valid_foodtypes = restaurant_infos["food"].dropna().unique().tolist()
     valid_priceranges = restaurant_infos["pricerange"].dropna().unique().tolist()
+
+    valid_areas.append("any")
+    valid_foodtypes.append("any")
+    valid_priceranges.append("any")
 
     agent()
