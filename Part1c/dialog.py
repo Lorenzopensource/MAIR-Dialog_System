@@ -222,18 +222,19 @@ def agent():
 
         user_input = input(f"{message}\n")
 
-        if user_input == "c":
+        if user_input == "c" or user_input == "C":
             restarts, delay, cap = set_configs()
-            state = oldstate
+            user_input = ""
+            state = "introduction"
             continue
 
-        if user_input == "m":
+        if user_input == "m" or user_input == "M":
             info = modify_preferences(info, cap, delay)
             user_input = ""
             state = "introduction"
             continue
 
-        if user_input == "r":
+        if user_input == "r" or user_input == "R":
             if not restarts:
                 log("Restarting not allowed quiting....", cap, delay)
                 break
@@ -313,33 +314,6 @@ def state_transaction_function(state, user_input, info, cap, delay):
                 return "confirmation", f"So you are looking for a restaurant in {info['context']['area']} with {info['context']['food']} food in the price range {info['context']['pricerange']} right?"
         else:
             return "ask_price", "We could not find that price range, please try another one"
-
-    if state == "check_area":
-        vectorized = vectorizer.transform([user_input])
-        prediction = model.predict(vectorized)
-
-        if prediction[0] == "affirm":
-            return "ask_foodtype", "for what food type are you looking?"
-        else:
-            return "ask_area", "in what area you looking for a restaurant"
-
-    if state == "check_foodtype":
-        vectorized = vectorizer.transform([user_input])
-        prediction = model.predict(vectorized)
-
-        if prediction[0] == "affirm":
-            return "ask_price", "In what price range are you looking?"
-        else:
-            return "ask_foodtype", "for what food type are you looking?"
-
-    if state == "check_price":
-        vectorized = vectorizer.transform([user_input])
-        prediction = model.predict(vectorized)
-
-        if prediction[0] == "affirm":
-            return "confirmation", f"So you are looking for a restaurant in {info['context']['area']} with {info['context']['food']} food in the price range {info['context']['pricerange']} right?"
-        else:
-            return "ask_price", "In what price range are you looking?"
 
     if state == "confirmation":
         vectorized = vectorizer.transform([user_input])
