@@ -153,7 +153,7 @@ The following configurability features were implemented:
   User: 1
 
   ================================================================
-  THE PHONE NUMBER OF THE RESTAURANT IS: 01223 360966.
+  THE PHONE NUMBER OF THE RESTAURANT IS: 01223 506055.
   ================================================================
 
   DO YOU WANT ANY OTHER INFORMATION? 
