@@ -37,24 +37,8 @@ This project is about the development of a restaurant recommendations dialog sys
  ```bash
    pip install -r requirements.txt
  ```
-
-5. **Run the dataset_pre-processing**:
-```bash
-   python dataset_pre-processing.py
- ```
-7. **Run the baselines**:
-```bash
-   python dataset_pre-processing.py
- ```
-9. **Run the machine_learning models**:
-```bash
-   python machine_learning.py
- ```
-10. **Run the create_new_properties csv**:
-```bash
-   python create_new_properties.py
- ```
-11. **Run the dialog.py**:
+ 
+5. **Run the dialog**:
  ```bash
    python dialog.py
  ```
