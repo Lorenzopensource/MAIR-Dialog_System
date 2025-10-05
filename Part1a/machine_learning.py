@@ -39,7 +39,7 @@ def neural_network(x_train, y_train, x_test, y_test):
     return model
 
 def evaluation(model_name,model, x_test, y_test):
-    print("Evaluation metrics for {model_name}:")
+    print(f"Evaluation metrics for {model_name}:")
     print("Accuracy:", model.score(x_test, y_test))
     y_pred = model.predict(x_test)
     print(classification_report(y_test, y_pred, zero_division=1))
