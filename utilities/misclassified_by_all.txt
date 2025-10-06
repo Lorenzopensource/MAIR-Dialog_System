@@ -1,0 +1,63 @@
+Utterance: west area
+True label: reqalts
+Logistic Regression predicted: inform
+SVM predicted: inform
+Neural Network predicted: inform
+Rule-Based predicted: request
+---------------------------------------------------
+Utterance: any area
+True label: ack
+Logistic Regression predicted: reqalts
+SVM predicted: reqalts
+Neural Network predicted: reqalts
+Rule-Based predicted: request
+---------------------------------------------------
+Utterance: what type of food is it
+True label: inform
+Logistic Regression predicted: request
+SVM predicted: request
+Neural Network predicted: request
+Rule-Based predicted: request
+---------------------------------------------------
+Utterance: and whats the phone number
+True label: inform
+Logistic Regression predicted: request
+SVM predicted: request
+Neural Network predicted: request
+Rule-Based predicted: request
+---------------------------------------------------
+Utterance: s
+True label: inform
+Logistic Regression predicted: confirm
+SVM predicted: reqalts
+Neural Network predicted: confirm
+Rule-Based predicted: not_covered
+---------------------------------------------------
+Utterance: singaporean food
+True label: negate
+Logistic Regression predicted: inform
+SVM predicted: inform
+Neural Network predicted: request
+Rule-Based predicted: inform
+---------------------------------------------------
+Utterance: town
+True label: request
+Logistic Regression predicted: inform
+SVM predicted: inform
+Neural Network predicted: inform
+Rule-Based predicted: not_covered
+---------------------------------------------------
+Utterance: i want to find a restaurant in any area
+True label: reqalts
+Logistic Regression predicted: request
+SVM predicted: request
+Neural Network predicted: request
+Rule-Based predicted: request
+---------------------------------------------------
+Utterance: in the west part of town
+True label: ack
+Logistic Regression predicted: inform
+SVM predicted: inform
+Neural Network predicted: inform
+Rule-Based predicted: inform
+---------------------------------------------------

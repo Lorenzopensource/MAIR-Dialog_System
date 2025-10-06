@@ -2,7 +2,7 @@ import pandas
 import sklearn
 from sklearn.model_selection import train_test_split
 
-dataset_path = 'dialog_acts.dat' 
+dataset_path = 'utilities/dialog_acts.dat' 
 
 # Loading the dataset
 
@@ -27,5 +27,5 @@ dataset["utterance"] = dataset["utterance"].str.lower()
 train_data, test_data = train_test_split(dataset,  test_size=0.15, random_state=142)
 
 # Saving dataset
-train_data.to_csv("train_data.csv", index=False)
-test_data.to_csv("test_data.csv", index=False)
+train_data.to_csv("utilities/train_data.csv", index=False)
+test_data.to_csv("utilities/test_data.csv", index=False)

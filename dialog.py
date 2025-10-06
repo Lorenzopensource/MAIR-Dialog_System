@@ -7,7 +7,7 @@ import time
 # pre: properties is a dictionary with keys as column names and values as the desired values for those columns
 # post: returns a list of restaurant names that match the given properties
 def lookup(properties):
-    df = pd.read_csv("restaurant_info.csv")
+    df = pd.read_csv("utilities/restaurant_info_new_properties.csv")
 
     for key, value in properties.items():
         if value == "any":
@@ -41,8 +41,7 @@ def extract_properties(user_input, candidates):
 # post: returns "Yes" if the restaurant satisfies the additional requirement, "No" if it does not, "Unknown" if it cannot be inferred
 #       "Inconsistency" if the properties of the restaurant lead to an inconsistency
 def has_inferred_property(restaurant, add_req):
-    df = pd.read_csv("restaurant_info_new_properties.csv")
-    properties = df[df["restaurantname"] == restaurant.lower()]
+    properties = restaurant_infos[restaurant_infos["restaurantname"] == restaurant.lower()]
     if add_req == "touristic":
         # Rule 1: "If a restaurant is cheap and has good food quality then it is touristic"
         if properties["pricerange"].eq("cheap").any() and properties["foodquality"].eq("good").any():
@@ -368,31 +367,29 @@ def state_transaction_function(state, user_input, info, cap, delay):
             return "provide_info", "Would you like any information about the restaurant? \n - Type 1 for phone number \n - Type 2 for address \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
         
     if state == "provide_info":
-        df = pd.read_csv("restaurant_info.csv")
         restaurant_name = filter_add_req(info["restaurants"], info["context"]["addReq"])[1]
-
-        restaurant_infos = df[df["restaurantname"] == restaurant_name.lower()]
+        restaurant = restaurant_infos[restaurant_infos["restaurantname"] == restaurant_name.lower()]
 
         if user_input == "1":
-            log(f"\n================================================================ \n  The phone number of the restaurant is: {restaurant_infos['phone'].values[0]}. \n================================================================ \n ", cap, delay)
+            log(f"\n================================================================ \n  The phone number of the restaurant is: {restaurant['phone'].values[0]}. \n================================================================ \n ", cap, delay)
             return "provide_info", "Do you want any other information? \n - Type 2 for address \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
         elif user_input == "2":
-            log(f"\n================================================================ \n  The address of the restaurant is: {restaurant_infos['addr'].values[0]}. \n================================================================ \n ", cap, delay)
+            log(f"\n================================================================ \n  The address of the restaurant is: {restaurant['addr'].values[0]}. \n================================================================ \n ", cap, delay)
             return "provide_info",  "Do you want any other information? \n - Type 1 for phone number \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
         elif user_input == "3":
             log(f"\n================================================================ \n  The postcode of the restaurant is: {restaurant_infos['postcode'].values[0]}. \n================================================================ \n ", cap, delay)
             return "provide_info", "Do you want any other information? \n - Type 1 for phone number \n - Type 2 for address \n - Type 4 for all of them \n - Type any other character to exit the system \n"
         elif user_input == "4":
-            log(f"\n================================================================ \nPhone number: {restaurant_infos['phone'].values[0]} \nAddress: {restaurant_infos['addr'].values[0]} \nPostcode: {restaurant_infos['postcode'].values[0]} \n================================================================ \n ", cap, delay )
+            log(f"\n================================================================ \nPhone number: {restaurant['phone'].values[0]} \nAddress: {restaurant['addr'].values[0]} \nPostcode: {restaurant['postcode'].values[0]} \n================================================================ \n ", cap, delay )
             return "end","Thank you for using our services, goodbye!"
         else:
             return "end", "Thank you for using our services, goodbye!"
 
 if __name__ == "__main__":
-    model = joblib.load('Utterance_Classifier_NN.pkl')
-    vectorizer = joblib.load('Vectorizer_NN.pkl')
+    model = joblib.load('utilities/Utterance_Classifier_NN.pkl')
+    vectorizer = joblib.load('utilities/Vectorizer_NN.pkl')
 
-    restaurant_infos = pd.read_csv("restaurant_info.csv")
+    restaurant_infos = pd.read_csv("utilities/restaurant_info_new_properties.csv")
 
     valid_areas = restaurant_infos["area"].dropna().unique().tolist()
     valid_foodtypes = restaurant_infos["food"].dropna().unique().tolist()

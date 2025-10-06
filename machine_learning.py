@@ -111,8 +111,8 @@ if __name__ == "__main__":
 
 
     vectorizer = CountVectorizer(max_features=3000)
-    train_data = pandas.read_csv("train_data.csv")
-    test_data = pandas.read_csv("test_data.csv")
+    train_data = pandas.read_csv("utilities/train_data.csv")
+    test_data = pandas.read_csv("utilities/test_data.csv")
 
     x_train, y_train, x_test, y_test = preprocess_data(vectorizer, train_data, test_data)
 
@@ -131,8 +131,8 @@ if __name__ == "__main__":
     neural_net = neural_network(x_train, y_train, x_test, y_test)
 
     #Saving the best model
-    joblib.dump(log_reg, 'Utterance_Classifier_NN.pkl')
-    joblib.dump(vectorizer, 'Vectorizer_NN.pkl')
+    joblib.dump(log_reg, 'utilities/Utterance_Classifier_NN.pkl')
+    joblib.dump(vectorizer, 'utilities/Vectorizer_NN.pkl')
 
     while True:
         user_input = input("Select the model to test or type 'evaluation' (type 'q' to quit) -  Model options: \n 'most_frequent' - 'rule_based' - 'logistic_regression' - 'svm' - 'neural network' \n  ") 

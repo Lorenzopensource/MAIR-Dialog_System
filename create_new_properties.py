@@ -3,8 +3,8 @@ import random
 
 
 # Create new properties for the restaurants
-with open('restaurant_info.csv','r') as csvinput:
-    with open('restaurant_info_new_properties.csv', 'w') as csvoutput:
+with open('utilities/restaurant_info.csv','r') as csvinput:
+    with open('utilities/restaurant_info_new_properties.csv', 'w') as csvoutput:
         writer = csv.writer(csvoutput, lineterminator='\n')
         reader = csv.reader(csvinput)
 

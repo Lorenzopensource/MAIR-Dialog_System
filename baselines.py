@@ -41,11 +41,11 @@ def rule_based_prediction(utterance):
 
 if __name__ == "__main__":
     # Load the pre-processed testing data
-    train_data = pandas.read_csv("train_data.csv")
-    test_data = pandas.read_csv("test_data.csv")
+    train_data = pandas.read_csv("utilities/train_data.csv")
+    test_data = pandas.read_csv("utilities/test_data.csv")
 
     # Baseline 1: Most Frequent Class
-    most_frequent_class = most_frequent_class_baseline(train_data_path="train_data.csv")
+    most_frequent_class = most_frequent_class_baseline(train_data_path="utilities/train_data.csv")
     print("Most frequent class in training data:", most_frequent_class)
     baseline1_accuracy = (test_data['dialog_act'] == most_frequent_class).mean()
     print("Baseline 1 (Most Frequent Class) Accuracy:", baseline1_accuracy)
