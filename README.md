@@ -37,12 +37,23 @@ This project is about the development of a restaurant recommendations dialog sys
  ```bash
    pip install -r requirements.txt
  ```
+
+5. **Path assumption**:
+Each script must be run at the root folder of the project.
+Your directory should look like this:
+ ```bash
+(mair_venv)  MAIR-Dialog_System % ls
+EVALUATION.md                   __pycache__                     dataset_pre-processing.py       machine_learning.py             requirements.txt
+README.md                       baselines.py                    dialog-flow-diagram.pdf         mair_venv                       utilities
+README.pdf                      create_new_properties.py        dialog.py  
+```
+           
+
  
-5. **Run the dialog**:
+6. **Run the dialog**:
  ```bash
    python dialog.py
  ```
-
 
 ## Text Classification
 
