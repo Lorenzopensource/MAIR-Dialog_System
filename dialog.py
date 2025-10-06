@@ -25,7 +25,8 @@ def min_edit_distance(word, candidates):
     distances = [(c, Levenshtein.distance(word, c)) for c in candidates]
     return min(distances, key=lambda x: x[1])[0] if candidates else None
 
-
+# pre: user_input is a string, candidates is a list of strings
+# post: returns a list of candidates that are present in the user_input with an edit distance of at most 1
 def extract_properties(user_input, candidates):
     words = user_input.lower().split()
     extracted = []
@@ -54,27 +55,27 @@ def has_inferred_property(restaurant, add_req):
             return "No"
         else:
             return "Unknown"
-    elif add_req == "romantic":
+    if add_req == "assigned_seats":
+    # Rule 3: "If a restaurant is busy then it provides assigned seats"
+        if properties["crowdness"].eq("busy").any():
+            return "Yes"
+        else:
+            return "Unknown"
+    if add_req == "children":
+        # Rule 4: "If a restaurant has a long length of stay then it is not suitable for children",
+        if properties["lengthofstay"].eq("long").any():
+            return "No"
+        else:
+            return "Unknown"
+    if add_req == "romantic":
         # Rule 5: "If a restaurant is busy then it is not romantic",
         if properties["crowdness"].eq("busy").any():
             # Check for internal inconsistencies
             # Rule 6: "If a restaurant has a long length of stay then it is romantic",
             if properties["lengthofstay"].eq("long").any():
                 return "Inconsistency"
-            return "Yes"
+            return "No"
         elif properties["lengthofstay"].eq("long").any():
-            return "No"
-        else:
-            return "Unknown"
-    elif add_req == "children":
-        # Rule 4: "If a restaurant has a long length of stay then it is not suitable for children",
-        if properties["lengthofstay"].eq("long").any():
-            return "No"
-        else:
-            return "Unknown"
-    elif add_req == "assigned_seats":
-        # Rule 3: "If a restaurant is busy then it provides assigned seats"
-        if properties["crowdness"].eq("busy").any():
             return "Yes"
         else:
             return "Unknown"
@@ -363,7 +364,7 @@ def state_transaction_function(state, user_input, info, cap, delay):
         if not found:
             return 'ask_add', text
         else:
-            print(f' \nWe found this restaurant for you: \n================================================================ \n  {text} \n================================================================ \n')
+            log(f' \nWe found this restaurant for you: \n================================================================ \n  {text} \n================================================================ \n', cap , delay)
             return "provide_info", "Would you like any information about the restaurant? \n - Type 1 for phone number \n - Type 2 for address \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
         
     if state == "provide_info":
@@ -373,16 +374,16 @@ def state_transaction_function(state, user_input, info, cap, delay):
         restaurant_infos = df[df["restaurantname"] == restaurant_name.lower()]
 
         if user_input == "1":
-            print(f"\n================================================================ \n  The phone number of the restaurant is: {restaurant_infos['phone'].values[0]}. \n================================================================ \n ")
+            log(f"\n================================================================ \n  The phone number of the restaurant is: {restaurant_infos['phone'].values[0]}. \n================================================================ \n ", cap, delay)
             return "provide_info", "Do you want any other information? \n - Type 2 for address \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
         elif user_input == "2":
-            print(f"\n================================================================ \n  The address of the restaurant is: {restaurant_infos['addr'].values[0]}. \n================================================================ \n ")
+            log(f"\n================================================================ \n  The address of the restaurant is: {restaurant_infos['addr'].values[0]}. \n================================================================ \n ", cap, delay)
             return "provide_info",  "Do you want any other information? \n - Type 1 for phone number \n - Type 3 for postcode \n - Type 4 for all of them \n - Type any other character to exit the system \n"
         elif user_input == "3":
-            print(f"\n================================================================ \n  The postcode of the restaurant is: {restaurant_infos['postcode'].values[0]}. \n================================================================ \n ")
+            log(f"\n================================================================ \n  The postcode of the restaurant is: {restaurant_infos['postcode'].values[0]}. \n================================================================ \n ", cap, delay)
             return "provide_info", "Do you want any other information? \n - Type 1 for phone number \n - Type 2 for address \n - Type 4 for all of them \n - Type any other character to exit the system \n"
         elif user_input == "4":
-            print(f"\n================================================================ \nPhone number: {restaurant_infos['phone'].values[0]} \nAddress: {restaurant_infos['addr'].values[0]} \nPostcode: {restaurant_infos['postcode'].values[0]} \n================================================================ \n " )
+            log(f"\n================================================================ \nPhone number: {restaurant_infos['phone'].values[0]} \nAddress: {restaurant_infos['addr'].values[0]} \nPostcode: {restaurant_infos['postcode'].values[0]} \n================================================================ \n ", cap, delay )
             return "end","Thank you for using our services, goodbye!"
         else:
             return "end", "Thank you for using our services, goodbye!"
